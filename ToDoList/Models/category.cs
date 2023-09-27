@@ -2,25 +2,34 @@ using System.Collections.Generic;
 
 namespace ToDoList.Models
 {
-  public class Item
+  public class Category
   {
-    public string Description { get; set; }
-    private static List<Item> _instances = new List<Item> { };
-
-    public Item(string description)
-    {
-      Description = description;
-      _instances.Add(this);
-    }
-
-    public static List<Item> GetAll()
-    {
-      return _instances;
-    }
+    private static List<Category> _instances = new List<Category> { };
+    public string Name { get; set; }
+    public int Id { get; }
+    public List<Item> Items { get; set; }
 
     public static void ClearAll()
     {
       _instances.Clear();
+    }
+
+    public static List<Category> GetAll()
+    {
+      return _instances;
+    }
+
+    public Category(string categoryName)
+    {
+      Name = categoryName;
+      _instances.Add(this);
+      Id = _instances.Count;
+      Items = new List<Item> { };
+    }
+
+    public static Category Find(int searchId)
+    {
+      return _instances[searchId - 1];
     }
   }
 }
