@@ -21,19 +21,19 @@ namespace ToDoList.Controllers
         return View();
       }
 
-      [HttpPost("/items")]
-      public ActionResult Create(string description)
-      {
-        Item myItem = new Item(description);
-        return RedirectToAction("Index");
-      }
-
-      // [HttpPost("/categories")]
-      // public ActionResult Create(string categoryName)
+      // [HttpPost("/items")]
+      // public ActionResult Create(string description)
       // {
-      //   Category newCategory = new Category(categoryName);
+      //   Item myItem = new Item(description);
       //   return RedirectToAction("Index");
       // }
+
+      [HttpPost("/categories")]
+      public ActionResult Create(string categoryName)
+      {
+        Category newCategory = new Category(categoryName);
+        return RedirectToAction("Index");
+      }
 
       [HttpPost("/categories/{categoryId}/items")]
       public ActionResult Create(int categoryId, string itemDescription)
@@ -50,13 +50,13 @@ namespace ToDoList.Controllers
 
       [HttpGet("/categories/{id}")]
       public ActionResult Show(int id)
-  {
-    Dictionary<string, object> model = new Dictionary<string, object>();
-    Category selectedCategory = Category.Find(id);
-    List<Item> categoryItems = selectedCategory.Items;
-    model.Add("category", selectedCategory);
-    model.Add("items", categoryItems);
-    return View(model);
-  }
+      {
+        Dictionary<string, object> model = new Dictionary<string, object>();
+        Category selectedCategory = Category.Find(id);
+        List<Item> categoryItems = selectedCategory.Items;
+        model.Add("category", selectedCategory);
+        model.Add("items", categoryItems);
+        return View(model);
+      }
   }
 }
