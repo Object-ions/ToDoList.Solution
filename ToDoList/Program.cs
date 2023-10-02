@@ -11,12 +11,14 @@ namespace ToDoList
 
       builder.Services.AddControllersWithViews();
 
+      DBConfiguration.ConnectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
+
       WebApplication app = builder.Build();
 
       app.UseHttpsRedirection();
 
       app.UseStaticFiles();
-      
+
       app.UseRouting();
 
       app.MapControllerRoute(
