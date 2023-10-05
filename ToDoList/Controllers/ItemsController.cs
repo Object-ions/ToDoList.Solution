@@ -33,6 +33,10 @@ namespace ToDoList.Controllers
     [HttpPost]
     public ActionResult Create(Item item)
     {
+      if (item.CategoryId == 0)
+      {
+        return RedirectToAction("Create");
+      }
       _db.Items.Add(item);
       _db.SaveChanges();
       return RedirectToAction("Index");
@@ -42,6 +46,14 @@ namespace ToDoList.Controllers
     {
       Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
       ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
+      return View(thisItem);
+    }
+
+    public ActionResult Details(int id)
+    {
+      Item thisItem = _db.Items
+                          .Include(item => item.Category)
+                          .FirstOrDefault(item => item.ItemId == id);
       return View(thisItem);
     }
   }
