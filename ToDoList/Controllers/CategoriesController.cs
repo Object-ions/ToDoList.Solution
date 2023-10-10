@@ -33,7 +33,6 @@ namespace ToDoList.Controllers
       _db.SaveChanges();
       return RedirectToAction("Index");
     }
-
     public ActionResult Details(int id)
     {
       Category thisCategory = _db.Categories
@@ -44,11 +43,6 @@ namespace ToDoList.Controllers
       return View(thisCategory);
     }
 
-    public ActionResult Edit(int id)
-    {
-      Category thisCategory = _db.Categories.FirstOrDefault(category => category.CategoryId == id);
-      return View(thisCategory);
-    }
 
     [HttpPost]
     public ActionResult Edit(Category category)

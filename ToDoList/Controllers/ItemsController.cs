@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Models;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ToDoList.Controllers
 {
@@ -16,38 +16,38 @@ namespace ToDoList.Controllers
       _db = db;
     }
 
+
     public ActionResult Index()
     {
       List<Item> model = _db.Items
                             .Include(item => item.Category)
                             .ToList();
-      ViewBag.PageTitle = "View All Items";
       return View(model);
     }
+
     public ActionResult Create()
     {
       ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
       return View();
     }
 
+
     [HttpPost]
     public ActionResult Create(Item item)
     {
-      if (item.CategoryId == 0)
-      {
-        return RedirectToAction("Create");
+      if (!ModelState.IsValid)
+      { //if the model state is not valid, the we will be taken to the create item page after
+        ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
+        return View(item);
       }
-      _db.Items.Add(item);
-      _db.SaveChanges();
-      return RedirectToAction("Index");
+      else
+      {
+        _db.Items.Add(item);
+        _db.SaveChanges();
+        return RedirectToAction("Index");
+      }
     }
 
-    public ActionResult Edit(int id)
-    {
-      Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-      ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
-      return View(thisItem);
-    }
 
     public ActionResult Details(int id)
     {
@@ -58,5 +58,66 @@ namespace ToDoList.Controllers
           .FirstOrDefault(item => item.ItemId == id);
       return View(thisItem);
     }
+
+
+    public ActionResult Edit(int id)
+    {
+      Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
+      ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
+      return View(thisItem);
+    }
+
+    [HttpPost]
+    public ActionResult Edit(Item item)
+    {
+      _db.Items.Update(item);
+      _db.SaveChanges();
+      return RedirectToAction("Index");
+    }
+
+    public ActionResult Delete(int id)
+    {
+      Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
+      return View(thisItem);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    public ActionResult DeleteConfirmed(int id)
+    {
+      Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
+      _db.Items.Remove(thisItem);
+      _db.SaveChanges();
+      return RedirectToAction("Index");
+    }
+    public ActionResult AddTag(int id)
+    {
+      Item thisItem = _db.Items.FirstOrDefault(items => items.ItemId == id);
+      ViewBag.TagId = new SelectList(_db.Tags, "TagId", "Title");
+      return View(thisItem);
+    }
+
+    [HttpPost]
+    public ActionResult AddTag(Item item, int tagId)
+    {
+#nullable enable
+      ItemTag? joinEntity = _db.ItemTags.FirstOrDefault(join => (join.TagId == tagId && join.ItemId == item.ItemId));
+#nullable disable
+      if (joinEntity == null && tagId != 0)
+      {
+        _db.ItemTags.Add(new ItemTag() { TagId = tagId, ItemId = item.ItemId });
+        _db.SaveChanges();
+      }
+      return RedirectToAction("Details", new { id = item.ItemId });
+    }
+    [HttpPost]
+    public ActionResult DeleteJoin(int joinId)
+    {
+      ItemTag joinEntry = _db.ItemTags.FirstOrDefault(entry => entry.ItemTagId == joinId);
+      _db.ItemTags.Remove(joinEntry);
+      _db.SaveChanges();
+      return RedirectToAction("Index");
+    }
+
+
   }
 }
